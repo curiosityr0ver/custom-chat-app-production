@@ -8,7 +8,8 @@ A dynamic chat room that allows users to join and engage in real time conversati
 
 #### Example:
 
-[ PRETEND SCREEN SHOT IS HERE ]
+![Screenshot 2024-02-15 at 22-40-36 React App](https://github.com/curiosityr0ver/custom-chat-app-production/assets/62722431/89cdd7ac-332a-4eff-bfed-ba8f42520dc4)
+
 
 ## Installation and Setup Instructions
 
