@@ -2,38 +2,26 @@ const express = require("express");
 const connectDB = require("./config/db");
 require("dotenv").config();
 const userRouter = require("./routes/userRoute");
-const chatRouter = require("./routes/chatRoute");
-const messageRouter = require("./routes/messageRoute");
+const taskRouter = require("./routes/taskRoute");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-const path = require("path");
+var cors = require('cors');
 const colors = require("colors");
 
 
 console.clear();
 connectDB();
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 
 
+
 app.use('/api/user', userRouter);
-app.use('/api/chat', chatRouter);
-app.use("/api/message", messageRouter);
-
-// Deployement
-const __dirname1 = path.resolve();
-
-if (process.env.NODE_ENV == 'production') {
-    app.use(express.static(path.join(__dirname1, '/frontend/build')));
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
-    });
-
-} else {
-    app.get('/', (req, res) => {
-        res.send("Server is broadcasting APIs");
-    });
-}
+app.use('/api/task', taskRouter);
+app.get('/', (req, res) => {
+    res.send("Server is broadcasting APIs");
+});
 
 
 app.use(notFound);
@@ -47,8 +35,7 @@ const server = app.listen(PORT, console.log(`Server started on port ${PORT}`.yel
 const io = require("socket.io")(server, {
     pingTimeout: 60000,
     cors: {
-        // origin: "http://localhost:3000", // (for local machine, also change is SingleChat.js)
-        origin: "https://custom-mern-chat-app-production.onrender.com"
+        origin: "http://localhost:3000", // (for local machine, also change is SingleTask.js)
         // credentials: true,
     },
 });
@@ -63,25 +50,21 @@ io.on("connection", (socket) => {
     socket.on("join chat", (room) => {
         socket.join(room);
         console.log("User Joined Room: " + room);
-    });
-    socket.on("typing", (room) => socket.in(room).emit("typing"));
-    socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-    socket.on("new message", (newMessageRecieved) => {
-        // console.log(newMessageRecieved);
-        var chat = newMessageRecieved.chat;
 
-        if (!chat.users) return console.log("chat.users not defined");
+        socket.on("new task", (newTaskReceived) => {
+            // console.log(newMessageRecieved);
+            var task = newTaskReceived.task;
 
-        chat.users.forEach(user => {
-            if (user._id == newMessageRecieved.sender._id) return;
+            if (!chat.sender) return console.log("chat.sender not defined");
 
-            socket.in(user._id).emit("message recieved", newMessageRecieved);
+            socket.in(chat.sender._id).emit("task recieved", newTaskReceived);
+
         });
-    });
 
-    socket.off("setup", () => {
-        console.log("USER DISCONNECTED");
-        socket.leave(userData._id);
+        socket.off("setup", () => {
+            console.log("USER DISCONNECTED");
+            socket.leave(userData._id);
+        });
     });
 });
