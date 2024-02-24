@@ -2,7 +2,7 @@
 
 https://custom-mern-chat-app-production.onrender.com/chats
 
-A dynamic chat room that allows users to join and engage in real time conversations in both person-to-person and group format.
+A dynamic chat room that allows users to join and engage in real time conversations in both person-to-person and group formatted.
 
 ## Project Screenshot
 
